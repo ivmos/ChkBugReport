@@ -309,7 +309,7 @@ import java.util.Vector;
                         li.add("  waiting: ");
                         li.add(new Link(s.getAnchor(), s.getName()));
                         if (s.getWaitOn().getLockId() != null && s.getWaitOn().getLockType() != null) {
-                            li.add(" for " + s.getWaitOn().getLockType());
+                            li.add(" for " + stackWaitOn.getLockType());
                         }
                         break;
                     }
