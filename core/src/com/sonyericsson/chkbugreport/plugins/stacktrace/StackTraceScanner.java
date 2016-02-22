@@ -121,6 +121,8 @@ import java.util.regex.Pattern;
                         curStackTrace.addStackTraceItem(item);
                         if (buff.startsWith("waiting ")) {
                             processWaitingToLockLine(curStackTrace, buff);
+                        } else if (buff.startsWith("locked ")) {
+                            processLockedLine(curStackTrace, buff);
                         }
                     } else if (buff.startsWith("  at ")) {
                         int idx0 = buff.indexOf('(');
@@ -187,6 +189,14 @@ import java.util.regex.Pattern;
                     curStackTrace.setWaitOn(new StackTrace.WaitInfo(tid, lockId, lockType));
                 }
             }
+        }
+    }
+
+    private void processLockedLine(StackTrace curStackTrace, String buff) {
+        String lockId = buff.substring(buff.indexOf("<") + 1, buff.indexOf(">"));
+        if (lockId.length() > 0) {
+            String lockType = buff.substring(buff.indexOf("(") + 1, buff.indexOf(")"));
+            curStackTrace.addAcquiredLock(lockId, lockType);
         }
     }
 

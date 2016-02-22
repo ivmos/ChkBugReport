@@ -23,6 +23,8 @@ import com.sonyericsson.chkbugreport.doc.Anchor;
 
 import java.lang.ref.WeakReference;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Vector;
 
 /* package */ final class StackTrace implements Iterable<StackTraceItem> {
@@ -38,6 +40,8 @@ import java.util.Vector;
     private int mPid;
     private StackTrace mAidlDep;
     private Anchor mAnchor;
+    private final Map<String, String> acquiredLockMap = new LinkedHashMap<String, String>();
+
 
     static class WaitInfo {
         private final int threadId;
@@ -162,6 +166,14 @@ import java.util.Vector;
 
     public void setWaitOn(WaitInfo waitInfo) {
         this.waitInfo = waitInfo;
+    }
+
+    public Map<String, String> getAcquiredLockMap() {
+        return acquiredLockMap;
+    }
+
+    public void addAcquiredLock(String lockId, String lockType) {
+        acquiredLockMap.put(lockId, lockType);
     }
 
     public String getState() {
