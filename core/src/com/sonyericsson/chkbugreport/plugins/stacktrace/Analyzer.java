@@ -30,8 +30,8 @@ import com.sonyericsson.chkbugreport.doc.List;
 import com.sonyericsson.chkbugreport.doc.Para;
 import com.sonyericsson.chkbugreport.doc.ProcessLink;
 
-import java.util.HashMap;
-import java.util.Vector;
+import java.awt.*;
+import java.util.*;
 
 /* package */ final class Analyzer {
 
@@ -276,7 +276,9 @@ import java.util.Vector;
                 }
                 procNames.append(procList.get(j).getName());
             }
-
+            //Digraph digraph = new Digraph(deadlock.size() + blocked.size());
+            br.initThreadsDependencyGraph(deadlock.size() + blocked.size());
+            //Map<String, Integer> threadsNodeIds = new HashMap<String, Integer>();
             Bug bug = new Bug(Bug.Type.PHONE_ERR, Bug.PRIO_DEADLOCK, 0, "Deadlock in process(es) " + procNames);
             DocNode msg = new Block(bug).addStyle("bug");
             new Para(msg)
@@ -302,12 +304,24 @@ import java.util.Vector;
             li.add(new ProcessLink(br, p.getPid()));
             li.add(" / ");
             li.add(new Link(stack.getAnchor(), stack.getName()));
+            /*if (!threadNodeIds.containsKey(stack.getName())) {
+                threadNodeIds.put(stack.getName(), threadNodeIds.size());
+            }*/
+            br.addNodeToThreadsDependencyGraph(stack.getName());
             StackTrace.WaitInfo stackWaitOn = stack.getWaitOn();
             if (stackWaitOn != null && referenceList != null) {
                 for (StackTrace s : referenceList) {
                     if (s.getTid() == stackWaitOn.getThreadId()) {
                         li.add("  waiting: ");
                         li.add(new Link(s.getAnchor(), s.getName()));
+                        /*if (!threadNodeIds.containsKey(s.getName())) {
+                            threadNodeIds.put(s.getName(), threadNodeIds.size());
+                        }*/
+                        br.addNodeToThreadsDependencyGraph(s.getName());
+                        br.addEdgeToThreadsDependencyGraph(
+                                stack.getName(),
+                                s.getName(),
+                                stackWaitOn.getLockType());
                         if (s.getWaitOn().getLockId() != null && s.getWaitOn().getLockType() != null) {
                             li.add(" for " + stackWaitOn.getLockType());
                         }
@@ -319,3 +333,4 @@ import java.util.Vector;
     }
 
 }
+

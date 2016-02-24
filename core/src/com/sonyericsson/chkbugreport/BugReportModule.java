@@ -59,12 +59,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Vector;
+import java.util.*;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -95,6 +90,8 @@ public class BugReportModule extends Module {
     private GuessedValue<Long> mUpTime = new GuessedValue<Long>(0L);
 
     private Vector<String> mBugReportHeader = new Vector<String>();
+
+    private ThreadsDependencyGraph threadsDependencyGraph;
 
     /**
      * Create an instance in order to process a bugreport.
@@ -677,6 +674,22 @@ public class BugReportModule extends Module {
         type.set(TYPE_BUGREPORT, 1); // low probability, so this will be used only as a fallback
     }
 
+    public void initThreadsDependencyGraph(int v) {
+       this.threadsDependencyGraph = new ThreadsDependencyGraph(v);
+    }
+
+    public void addNodeToThreadsDependencyGraph(String name) {
+        this.threadsDependencyGraph.addNodeIfMissing(name);
+    }
+
+    public void addEdgeToThreadsDependencyGraph(String nameV, String nameW, String lockType) {
+        this.threadsDependencyGraph.addEdge(nameV, nameW, lockType);
+    }
+
+    public ThreadsDependencyGraph getThreadsDependencyGraph() {
+        return threadsDependencyGraph;
+    }
+
     /* package */ static class SourceFile {
         String mName;
         String mType;
@@ -688,3 +701,5 @@ public class BugReportModule extends Module {
     }
 
 }
+
+
